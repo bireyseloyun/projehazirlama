@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Şifreyi Çöz!</title>
+</head>
+<body style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
+
+    <h2>Önce Bilgilerini Gir</h2>
+    
+    <label for="isim">Adınız:</label>
+    <input type="text" id="isim" placeholder="Adınızı girin" required><br><br>
+
+    <label for="sinif">Sınıfınız:</label>
+    <input type="text" id="sinif" placeholder="Sınıfınızı girin" required><br><br>
+
+    <label for="yas">Yaşınız:</label>
+    <input type="number" id="yas" placeholder="Yaşınızı girin" required><br><br>
+
+    <button onclick="bilgileriKontrolEt()">Devam Et</button>
+
+    <div id="ipucu" style="display: none; margin-top: 20px;">
+        <h3>Şifreyi çözmek için ipucu:</h3>
+        <p>
+            Son derste izlediğimiz belgeseli hatırla...
+            (Büyük harflerle yazmalısın!)  
+        </p>
+        <input type="text" id="sifre" placeholder="Şifreyi gir">
+        <button onclick="sifreKontrolEt()">Gönder</button>
+        <p id="mesaj"></p>
+    </div>
+
+    <script>
+        function bilgileriKontrolEt() {
+            let isim = document.getElementById('isim').value;
+            let sinif = document.getElementById('sinif').value;
+            let yas = document.getElementById('yas').value;
+
+            if (isim && sinif && yas) {
+                document.getElementById('ipucu').style.display = 'block';
+            } else {
+                alert("Lütfen tüm bilgileri eksiksiz doldurun!");
+            }
+        }
+
+        function sifreKontrolEt() {
+            const sifre = document.getElementById('sifre').value;
+            if (sifre === "ABSTRACT") {
+                document.getElementById('mesaj').innerHTML = `
+                    <b style="color: green;">Tebrikler! Doğru şifreyi buldun! 🔥</b><br>
+                    <a href="https://docs.google.com/document/d/1WsbhIwPoxlnEvzsf3FzwmqdW7Hi13nXYKJ4F1hpFX1U/edit?usp=drivesdk" 
+                    target="_blank">👉 Çalışma Sorularına Git</a>
+                `;
+            } else {
+                document.getElementById('mesaj').innerHTML = `
+                    <b style="color: red;">❌ Yanlış şifre! Tekrar dene...</b>
+                `;
+            }
+        }
+    </script>
+
+</body>
+</html>
