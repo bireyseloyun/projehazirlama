@@ -1,0 +1,10 @@
+import {readFileSync,writeFileSync} from 'node:fs';
+import {randomBytes,createCipheriv,publicEncrypt,constants} from 'node:crypto';
+import path from 'node:path';
+const directory=path.join(process.env.RUNNER_TEMP,'eylem-signing');
+const data=JSON.stringify({keystore:readFileSync(path.join(directory,'release.jks')).toString('base64'),password:readFileSync(path.join(directory,'password.txt'),'utf8')});
+const key=randomBytes(32),iv=randomBytes(12),cipher=createCipheriv('aes-256-gcm',key,iv);
+const ciphertext=Buffer.concat([cipher.update(data,'utf8'),cipher.final()]);
+const encryptedKey=publicEncrypt({key:readFileSync(new URL('./signing-public-key.pem',import.meta.url)),padding:constants.RSA_PKCS1_OAEP_PADDING,oaepHash:'sha256'},key);
+writeFileSync(path.join(process.env.RUNNER_TEMP,'eylem-signing-key.sealed.json'),JSON.stringify({version:1,key:encryptedKey.toString('base64'),iv:iv.toString('base64'),tag:cipher.getAuthTag().toString('base64'),data:ciphertext.toString('base64')}));
+console.log('Signing backup encrypted with owner-held recovery key.');

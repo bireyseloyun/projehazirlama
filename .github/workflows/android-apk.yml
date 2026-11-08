@@ -30,14 +30,6 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-      - name: Install verified Gradle distribution
-        run: |
-          curl --fail --location --retry 3 --retry-all-errors --connect-timeout 30 --max-time 240 \
-            https://github.com/gradle/gradle-distributions/releases/download/v9.1.0/gradle-9.1.0-bin.zip \
-            -o "$RUNNER_TEMP/gradle.zip"
-          echo "a17ddd85a26b6a7f5ddb71ff8b05fc5104c0202c6e64782429790c933686c806  $RUNNER_TEMP/gradle.zip" | sha256sum --check
-          unzip -q "$RUNNER_TEMP/gradle.zip" -d "$RUNNER_TEMP"
-          echo "$RUNNER_TEMP/gradle-9.1.0/bin" >> "$GITHUB_PATH"
       - uses: gradle/actions/setup-gradle@v4
         with:
           cache-read-only: false
@@ -50,18 +42,20 @@ jobs:
       - name: Prepare signing key
         env:
           GH_TOKEN: ${{ github.token }}
+          EYLEM_SIGNING_KEY_B64: ${{ secrets.EYLEM_SIGNING_KEY_B64 }}
+          EYLEM_SIGNING_PASSWORD: ${{ secrets.EYLEM_SIGNING_PASSWORD }}
         run: bash scripts/signing-key.sh
-      - name: Preserve signing key for updates
-        uses: actions/upload-artifact@v4
-        with:
-          name: eylem-signing-key
-          path: |
-            ${{ runner.temp }}/eylem-signing/release.jks
-            ${{ runner.temp }}/eylem-signing/password.txt
-          retention-days: 90
-          if-no-files-found: error
       - name: Build signed APK and test APK
         run: gradle -p android assembleRelease assembleDebug assembleDebugAndroidTest --no-daemon
+      - name: Encrypt owner signing backup
+        run: node scripts/seal-signing-key.mjs
+      - name: Preserve encrypted signing backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: eylem-signing-key-encrypted
+          path: ${{ runner.temp }}/eylem-signing-key.sealed.json
+          retention-days: 90
+          if-no-files-found: error
       - name: Upload installable APK
         uses: actions/upload-artifact@v4
         with:
@@ -76,7 +70,7 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
       - name: Verify offline Android lifecycle and backup
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
         with:
           api-level: 35
           target: google_apis
@@ -94,4 +88,3 @@ jobs:
             eylem-pusulasi/android/app/build/reports/androidTests/
             eylem-pusulasi/android/app/build/outputs/androidTest-results/
           if-no-files-found: ignore
-

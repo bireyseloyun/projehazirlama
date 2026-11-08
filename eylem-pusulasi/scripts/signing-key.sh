@@ -2,15 +2,14 @@
 set -euo pipefail
 signing_dir="$RUNNER_TEMP/eylem-signing"
 mkdir -p "$signing_dir"
-# Keep an existing key so future APKs update the app without uninstalling it.
-artifact_id="$(gh api --paginate "repos/$GITHUB_REPOSITORY/actions/artifacts?name=eylem-signing-key&per_page=100" --jq '.artifacts[] | select(.expired == false) | .id' | head -n 1)"
-if [[ -n "$artifact_id" ]]; then
-  gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$artifact_id/zip" > "$RUNNER_TEMP/eylem-signing.zip"
-  unzip -q "$RUNNER_TEMP/eylem-signing.zip" -d "$signing_dir"
+# Updates must use the owner's existing key, supplied as repository secrets.
+if [[ -n "${EYLEM_SIGNING_KEY_B64:-}" && -n "${EYLEM_SIGNING_PASSWORD:-}" ]]; then
+  printf '%s' "$EYLEM_SIGNING_KEY_B64" | base64 --decode > "$signing_dir/release.jks"
+  printf '%s' "$EYLEM_SIGNING_PASSWORD" > "$signing_dir/password.txt"
 else
   previous="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs?branch=eylem-pusulasi-android&status=success&per_page=100" --jq '.workflow_runs | length')"
   if [[ "$previous" != "0" ]]; then
-    echo "Previous signing key is no longer available. Restore the user's signing backup instead of generating a different key."
+    echo "An APK was already delivered. Configure the owner's signing key secrets before building an update; a different key will not be generated."
     exit 1
   fi
   password="$(openssl rand -hex 32)"

@@ -17,11 +17,11 @@ Kayıtlar uygulamanın özel alanındaki IndexedDB'de kalır. Uygulamayı kapat�
 
 Güncelleme için yeni APK'yi mevcut uygulamanın üzerine kurun. Uygulama kimliği `com.eylempusulasi.app` ve imza anahtarı korunmalıdır. Teslim edilen **imza yedeğini özel olarak saklayın**; gelecekte aynı uygulamayı güncellemek için gerekir. Anahtarı ve içindeki parolayı herkese açık kaynak deposuna koymayın.
 
-GitHub yalnızca kaynak kodunu derlemek için kullanılır; kurulan uygulama GitHub'a bağlanmaz. İmza dosyası çalışma çıktısı olarak 90 gün tutulur ve bu süre içinde sonraki derlemeler aynı anahtarı kullanır. Daha sonra yerel imza yedeğinden devam edilmelidir; eski anahtar yoksa sistem yeni anahtara sessizce geçmez.
+GitHub yalnızca kaynak kodunu derlemek için kullanılır; kurulan uygulama GitHub'a bağlanmaz. İmza dosyası GitHub'a açık biçimde yüklenmez: yalnızca özel kurtarma anahtarı bu bilgisayarda kalan, şifrelenmiş bir yedek yüklenir. Teslim edilen yerel imza yedeğinden gelecekteki güncellemeler hazırlanabilir. Başarılı ilk sürümden sonra otomatik güncellemeler için GitHub deposunun `EYLEM_SIGNING_KEY_B64` ve `EYLEM_SIGNING_PASSWORD` sırları yapılandırılmalıdır. Bunlar yoksa sistem farklı bir anahtara sessizce geçmez.
 
 ## Tekrar derleme
 
-Node 24 + pnpm 11.25.0, JDK 17, Gradle 9.1.0, Android SDK 36 ve Build Tools 36.0.0 gerekir. GitHub Actions iş akışı bunları hazır ortamda kullanır.
+Node 24 + pnpm 11.25.0, JDK 17, Gradle 9.1 veya uyumlu bir sonraki 9.x sürümü, Android SDK 36 ve Build Tools 36.0.0 gerekir. GitHub Actions iş akışı bunları hazır ortamda kullanır.
 
 ```sh
 pnpm install --frozen-lockfile
