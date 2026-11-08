@@ -1,0 +1,6 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <provider android:name="com.eylempusulasi.app.TestDocumentsProvider"
+            android:authorities="com.eylempusulasi.app.test.documents" android:exported="true" />
+    </application>
+</manifest>

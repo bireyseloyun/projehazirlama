@@ -1,0 +1,13 @@
+node_modules/
+.pnpm-store/
+.sites-runtime/
+dist/
+test-results/
+playwright-report/
+*.local
+*.tsbuildinfo
+android/.gradle/
+android/build/
+android/app/build/
+android/app/src/main/assets/www/
+android/local.properties
