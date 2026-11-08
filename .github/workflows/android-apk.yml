@@ -30,9 +30,17 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
+      - name: Install verified Gradle distribution
+        run: |
+          curl --fail --location --retry 3 --retry-all-errors --connect-timeout 30 --max-time 240 \
+            https://github.com/gradle/gradle-distributions/releases/download/v9.1.0/gradle-9.1.0-bin.zip \
+            -o "$RUNNER_TEMP/gradle.zip"
+          echo "a17ddd85a26b6a7f5ddb71ff8b05fc5104c0202c6e64782429790c933686c806  $RUNNER_TEMP/gradle.zip" | sha256sum --check
+          unzip -q "$RUNNER_TEMP/gradle.zip" -d "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/gradle-9.1.0/bin" >> "$GITHUB_PATH"
       - uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: 9.1.0
+          cache-read-only: false
       - name: Install web dependencies
         run: pnpm install --frozen-lockfile
       - name: Test domain and build local app assets
@@ -86,3 +94,4 @@ jobs:
             eylem-pusulasi/android/app/build/reports/androidTests/
             eylem-pusulasi/android/app/build/outputs/androidTest-results/
           if-no-files-found: ignore
+
